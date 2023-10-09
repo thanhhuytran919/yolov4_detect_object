@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>YOLOv4 Object Detection</title>
+  </head>
+  <body>
+    <h1>YOLOv4 Object Detection</h1>
+    <form
+      method="POST"
+      action="/detect"
+      enctype="multipart/form-data"
+      id="detectForm"
+    >
+      <input
+        type="file"
+        name="image"
+        accept=".jpg, .jpeg, .png"
+        id="imageInput"
+        onchange="displaySelectedImage()"
+      />
+      <input type="button" value="Detect Objects" onclick="detectObjects()" />
+    </form>
+
+    <!-- Hiển thị ảnh đã chọn (bằng cách đặt src là trống) -->
+    <div class="result-item">
+      <h3 class="image-header">Ảnh gốc</h3>
+      <img
+        src=""
+        alt="Ảnh gốc"
+        class="selected-image"
+        id="selectedImage"
+        width="416"
+        height="416"
+      />
+    </div>
+
+    <!-- Hiển thị ảnh đã detect (bằng cách đặt src là trống) -->
+    <div class="result-item" id="detectedImageDiv">
+      <h3 class="image-header">Ảnh đã detect</h3>
+      <img
+        src=""
+        alt="Ảnh đã detect"
+        class="detected-image"
+        id="detectedImage"
+        width="416"
+        height="416"
+      />
+    </div>
+
+    <!-- Đoạn mã HTML để hiển thị JSON từ /api/detect -->
+    <div class="json-info" id="jsonInfoDetectDiv">
+      <h4>Thông tin trả về từ /api/detect:</h4>
+      <pre id="jsonInfoDetect"></pre>
+    </div>
+
+    <!-- Đường link để tải file JSON về (bằng cách đặt href là trống) -->
+    <a href="" download="result.json" id="downloadJsonLink"> Tải JSON </a>
+
+    <script>
+      var selectedImage = null; // Biến để lưu trữ ảnh đã chọn
+
+      // Hàm hiển thị ảnh đã chọn
+      function displaySelectedImage() {
+        var imageInput = document.getElementById("imageInput");
+        var file = imageInput.files[0];
+        var objectURL = URL.createObjectURL(file);
+        selectedImage = objectURL;
+        var selectedImageElement = document.getElementById("selectedImage");
+        selectedImageElement.src = selectedImage;
+      }
+
+      // Hàm thực hiện detect và gửi dữ liệu đến route /api/detect
+      function detectObjects() {
+        if (selectedImage) {
+          var formData = new FormData(document.getElementById("detectForm"));
+          fetch("/api/detect", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              showAPIDetectInfo(data);
+
+              updateDetectedImage();
+
+              showResultSections();
+
+              updateDownloadJsonLink(data);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        } else {
+          console.error("No image selected!");
+        }
+      }
+
+      // Hàm hiển thị thông tin từ /api/detect
+      function showAPIDetectInfo(data) {
+        var jsonInfoDetect = document.getElementById("jsonInfoDetect");
+        jsonInfoDetect.textContent = JSON.stringify(data, null, 2);
+
+        var jsonInfoDetectDiv = document.getElementById("jsonInfoDetectDiv");
+        jsonInfoDetectDiv.style.display = "block";
+      }
+
+      // Hàm cập nhật hình ảnh đã detect sử dụng Ajax
+      function updateDetectedImage() {
+        var detectedImageElement = document.getElementById("detectedImage");
+        detectedImageElement.src =
+          "/static/detected_image.jpg?" + new Date().getTime(); // Đảm bảo rằng URL ảnh là duy nhất để tránh cache
+      }
+
+      // Hàm cập nhật đường link để tải JSON
+      function updateDownloadJsonLink(data) {
+        var downloadJsonLink = document.getElementById("downloadJsonLink");
+        var jsonBlob = new Blob([JSON.stringify(data)], {
+          type: "application/json",
+        });
+        var jsonUrl = URL.createObjectURL(jsonBlob);
+        downloadJsonLink.href = jsonUrl;
+        downloadJsonLink.style.display = "block";
+      }
+
+      // Hàm hiển thị các phần sau khi đã chọn tệp ảnh
+      function showResultSections() {
+        var resultItem = document.querySelector(".result-item");
+        var jsonInfoDetectDiv = document.getElementById("jsonInfoDetectDiv");
+        var downloadJsonLink = document.getElementById("downloadJsonLink");
+
+        resultItem.style.display = "block";
+        jsonInfoDetectDiv.style.display = "block";
+        downloadJsonLink.style.display = "block";
+      }
+    </script>
+  </body>
+</html>
