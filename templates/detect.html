@@ -21,8 +21,7 @@
       <input type="button" value="Detect Objects" onclick="detectObjects()" />
     </form>
 
-    <!-- Hiển thị ảnh đã chọn (bằng cách đặt src là trống) -->
-    <div class="result-item">
+    <div class="result-item" style="display: none">
       <h3 class="image-header">Ảnh gốc</h3>
       <img
         src=""
@@ -34,8 +33,7 @@
       />
     </div>
 
-    <!-- Hiển thị ảnh đã detect (bằng cách đặt src là trống) -->
-    <div class="result-item" id="detectedImageDiv">
+    <div class="result-item" id="detectedImageDiv" style="display: none">
       <h3 class="image-header">Ảnh đã detect</h3>
       <img
         src=""
@@ -47,17 +45,29 @@
       />
     </div>
 
-    <!-- Đoạn mã HTML để hiển thị JSON từ /api/detect -->
-    <div class="json-info" id="jsonInfoDetectDiv">
+    <div class="json-info" id="jsonInfoDetectDiv" style="display: none">
       <h4>Thông tin trả về từ /api/detect:</h4>
       <pre id="jsonInfoDetect"></pre>
     </div>
 
-    <!-- Đường link để tải file JSON về (bằng cách đặt href là trống) -->
-    <a href="" download="result.json" id="downloadJsonLink"> Tải JSON </a>
+    <a
+      href=""
+      download="result.json"
+      id="downloadJsonLink"
+      style="display: none"
+      >Tải JSON</a
+    >
+
+    <input
+      type="button"
+      value="Continue detect"
+      id="continueDetectButton"
+      style="display: none"
+      onclick="continueDetect()"
+    />
 
     <script>
-      var selectedImage = null; // Biến để lưu trữ ảnh đã chọn
+      var selectedImage = null;
 
       // Hàm hiển thị ảnh đã chọn
       function displaySelectedImage() {
@@ -86,6 +96,12 @@
               showResultSections();
 
               updateDownloadJsonLink(data);
+
+              // Hiển thị nút "Continue detect" sau khi hoàn thành detect
+              var continueDetectButton = document.getElementById(
+                "continueDetectButton"
+              );
+              continueDetectButton.style.display = "block";
             })
             .catch((error) => {
               console.error("Error:", error);
@@ -99,16 +115,13 @@
       function showAPIDetectInfo(data) {
         var jsonInfoDetect = document.getElementById("jsonInfoDetect");
         jsonInfoDetect.textContent = JSON.stringify(data, null, 2);
-
-        var jsonInfoDetectDiv = document.getElementById("jsonInfoDetectDiv");
-        jsonInfoDetectDiv.style.display = "block";
       }
 
       // Hàm cập nhật hình ảnh đã detect sử dụng Ajax
       function updateDetectedImage() {
         var detectedImageElement = document.getElementById("detectedImage");
         detectedImageElement.src =
-          "/static/detected_image.jpg?" + new Date().getTime(); // Đảm bảo rằng URL ảnh là duy nhất để tránh cache
+          "/static/detected_image.jpg?" + new Date().getTime();
       }
 
       // Hàm cập nhật đường link để tải JSON
@@ -119,7 +132,6 @@
         });
         var jsonUrl = URL.createObjectURL(jsonBlob);
         downloadJsonLink.href = jsonUrl;
-        downloadJsonLink.style.display = "block";
       }
 
       // Hàm hiển thị các phần sau khi đã chọn tệp ảnh
@@ -127,10 +139,21 @@
         var resultItem = document.querySelector(".result-item");
         var jsonInfoDetectDiv = document.getElementById("jsonInfoDetectDiv");
         var downloadJsonLink = document.getElementById("downloadJsonLink");
+        var detectedImageDiv = document.getElementById("detectedImageDiv");
 
         resultItem.style.display = "block";
         jsonInfoDetectDiv.style.display = "block";
         downloadJsonLink.style.display = "block";
+        detectedImageDiv.style.display = "block";
+      }
+
+      // Hàm xử lý khi nhấn nút "Continue detect"
+      function continueDetect() {
+        document
+          .getElementById("continueDetectButton")
+          .addEventListener("click", function () {
+            window.location.href = "/detect";
+          });
       }
     </script>
   </body>
