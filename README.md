@@ -51,8 +51,8 @@ Make sure you have the following prerequisites installed:
 4. You should get images in folder /Model/Test images to detect. Image result will save in folder static.
 
 ### API Endpoint
-  > You can also use the API endpoint to perform object detection. Send a POST request to /api/detect with the image file to detect objects in the image.
-  > The API response will be in JSON format and include information about the detected objects.
+- You can also use the API endpoint to perform object detection. Send a POST request to /api/detect with the image file to detect objects in the image.
+- The API response will be in JSON format and include information about the detected objects.
 
 ### Contributing
 If you'd like to contribute to this project, please fork the repository, make your changes, and submit a pull request. Your contributions are greatly appreciated.
