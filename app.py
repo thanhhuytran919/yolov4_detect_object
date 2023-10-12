@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 # Đường dẫn đến thư mục chứa mô hình YOLOv4 và tệp trọng số
-YOLOV4_PATH = "F:/Besoft/API_1/Model"
+YOLOV4_PATH = "Model"
 
 # Đường dẫn đến thư mục chứa ảnh đã detect có khung
 STATIC_PATH = os.path.join(app.root_path, 'static')
